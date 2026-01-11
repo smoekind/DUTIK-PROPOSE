@@ -7,14 +7,39 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="intro" id="introText">
-      i hope you read this, even if it's too late.
+    <!-- Halaman Pertama -->
+    <div class="intro fade-in" id="introText">
+      Hey pretty, this is me being a little brave. Please read gently
     </div>
-    <button class="btn" onclick="showLetter()">Read it</button>
+    <button class="btn fade-in" id="startBtn" onclick="showVerification()">Read it</button>
 
+    <!-- Halaman Verifikasi -->
+    <div class="verification" id="verificationBox">
+      <h2>Before You Continue</h2>
+      <p>Please verify that you're NV to open the letter </p>
+      <input 
+        type="text" 
+        id="nameInput" 
+        placeholder="Nama panjangnya siapa, dut?"
+        autocomplete="off"
+      />
+      <div class="error-msg" id="errorMsg"></div>
+      <button class="btn" onclick="verifyName()">Continue</button>
+    </div>
+
+    <!-- Halaman Kedua (Surat) -->
     <div class="letter" id="letterBox">
       <p id="typedText"></p>
-      <img src="ttd.png" alt="Signature" class="signature" />
+      
+      <div id="signatureContainer" style="display: none;">
+        <!-- <img src="ttd.png" alt="Signature" class="signature" id="signature" /> -->
+      </div>
+      
+      <div id="readMeContainer">
+        <a href="propose.html">
+          <button class="btn-read-me">Answer it</button>
+        </a>
+      </div>
     </div>
 
     <script src="script.js"></script>
