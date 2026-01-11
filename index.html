@@ -1,47 +1,864 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>A Letter for You</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <!-- Halaman Pertama -->
-    <div class="intro fade-in" id="introText">
-      Hey pretty, this is me being a little brave. Please read gently
-    </div>
-    <button class="btn fade-in" id="startBtn" onclick="showVerification()">Read it</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A Letter for You</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <!-- Halaman Verifikasi -->
-    <div class="verification" id="verificationBox">
-      <h2>Before You Continue</h2>
-      <p>Please verify that you're NV to open the letter </p>
-      <input 
-        type="text" 
-        id="nameInput" 
-        placeholder="Nama panjangnya siapa, dut?"
-        autocomplete="off"
-      />
-      <div class="error-msg" id="errorMsg"></div>
-      <button class="btn" onclick="verifyName()">Continue</button>
-    </div>
+    body {
+      font-family: "Georgia", serif;
+      background: #1e1e2f;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding: 20px;
+    }
 
-    <!-- Halaman Kedua (Surat) -->
-    <div class="letter" id="letterBox">
-      <p id="typedText"></p>
+    /* Music Control Button */
+    .music-control {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #f5eeef;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 10000;
+    }
+
+    .music-control:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .music-control svg {
+      width: 24px;
+      height: 24px;
+      fill: #1e1e2f;
+    }
+
+    /* Fade animations */
+    .fade-in {
+      animation: fadeIn 0.8s ease-in;
+    }
+
+    .fade-out {
+      animation: fadeOut 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+    }
+
+    .intro {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 30px;
+      max-width: 400px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      font-size: 1rem;
+      background: #f5eeef;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      color: #050202;
+      transition: all 0.3s ease;
+      font-family: "Georgia", serif;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:hover {
+      background: #b1acad;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Verification styles */
+    .verification {
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      display: none;
+    }
+
+    .verification h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: #f5eeef;
+    }
+
+    .verification p {
+      font-size: 1rem;
+      margin-bottom: 25px;
+      color: #d2d2d2;
+    }
+
+    #nameInput {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border: 2px solid #f5eeef;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      margin-bottom: 15px;
+      font-family: "Georgia", serif;
+      transition: all 0.3s ease;
+    }
+
+    #nameInput:focus {
+      outline: none;
+      border-color: #b1acad;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    #nameInput::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      min-height: 20px;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Letter styles */
+    .letter {
+      display: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        #fdf6e3 0px,
+        #fdf6e3 25px,
+        #d2d2d2 26px
+      );
+      color: #333;
+      padding: 0px 30px 80px 70px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 700px;
+      min-height: 550px;
+      height: auto;
       
-      <div id="signatureContainer" style="display: none;">
-        <!-- <img src="ttd.png" alt="Signature" class="signature" id="signature" /> -->
-      </div>
-      
-      <div id="readMeContainer">
-        <a href="propose.html">
-          <button class="btn-read-me">Answer it</button>
-        </a>
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      text-align: left;
+      position: relative;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      font-family: "Courier New", monospace;
+      overflow-y: auto;
+    }
+
+    #typedText {
+      margin-top: 0;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .letter::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25px;
+      height: 100%;
+      background-image: radial-gradient(circle, #1e1e2f 6px, transparent 7px);
+      background-size: 25px 40px;
+      background-repeat: repeat-y;
+      background-position: center;
+      pointer-events: none;
+    }
+
+    #readMeContainer {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+    }
+
+    #readMeContainer.show {
+      opacity: 1;
+    }
+
+    .btn-read-me {
+      padding: 10px 30px;
+      background: #1e1e2f;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-family: "Georgia", serif;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .btn-read-me:hover {
+      background: #343454;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Propose Page Styles */
+    .propose-page {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e1e2f 0%, #2a2a3e 100%);
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 100;
+      padding: 40px 20px;
+    }
+
+    .propose-page.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.6s ease;
+    }
+
+    #proposeQuestion, #finalPage {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .bg-shapes {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .shape {
+      position: absolute;
+      opacity: 0.05;
+      animation: floatShape 20s infinite ease-in-out;
+    }
+
+    .shape:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 50%;
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 50%;
+      top: 60%;
+      left: 80%;
+      animation-delay: 2s;
+    }
+
+    .shape:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      background: #fdf6e3;
+      border-radius: 50%;
+      top: 80%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    @keyframes floatShape {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    .page1-content {
+      text-align: center;
+      background: #fdf6e3;
+      padding: 60px 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      animation: slideUp 0.8s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page1-content h2 {
+      color: #2a2a3e;
+      font-size: 1.8em;
+      margin-top: 12px;
+      margin-bottom: 20px;
+    }
+
+    .heart-icon {
+      margin: 30px 0;
+      animation: heartbeatBounce 1.5s infinite;
+      display: inline-block;
+    }
+
+    @keyframes heartbeatBounce {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      10% { transform: scale(1.15) rotate(-5deg); }
+      20% { transform: scale(1) rotate(5deg); }
+      30% { transform: scale(1.15) rotate(0deg); }
+      40% { transform: scale(1) rotate(0deg); }
+    }
+
+    .buttons {
+      margin-top: 40px;
+      position: relative;
+      height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .yes-btn {
+      background: #1e1e2f;
+      color: white;
+      margin: 10px;
+      padding: 16px 40px;
+      font-size: 1.05em;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+      z-index: 2;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .yes-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(30, 30, 47, 0.4);
+    }
+
+    .no-btn {
+      background: #f5f5f5;
+      color: #666;
+      position: absolute;
+      margin: 10px;
+      font-size: 0.9em;
+      padding: 14px 30px;
+      white-space: nowrap;
+      min-width: fit-content;
+      left: 50%;
+      top: 60%;
+      transform: translateX(-50%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .page2-content {
+      text-align: center;
+      background: #fdf6e3;
+      padding: 60px 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.8s ease;
+      position: relative;
+      z-index: 1;
+      margin: 20px;
+    }
+
+    .page2-content h1 {
+      color: #1e1e2f;
+      font-size: 1.8em;
+      margin-bottom: 30px;
+      line-height: 1.3;
+    }
+
+    .propose-letter {
+      color: #4a4a4a;
+      line-height: 1.8;
+      margin: 30px 0;
+      font-size: 1em;
+      text-align: left;
+      font-weight: 300;
+    }
+
+    .propose-letter p {
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-family: "Courier New", monospace;
+    }
+
+    .propose-letter p:first-child {
+      font-weight: 700;
+      color: #1e1e2f;
+      font-family: "Georgia", serif;
+    }
+
+    .propose-letter p:last-child {
+      text-align: right;
+      font-style: italic;
+      margin-top: 30px;
+      font-weight: 700;
+      color: #1e1e2f;
+      font-family: "Georgia", serif;
+    }
+
+    .contact-btn {
+      background: #1e1e2f;
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 30px;
+      padding: 16px 40px;
+      font-size: 1.05em;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(30, 30, 47, 0.2);
+    }
+
+    .contact-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(30, 30, 47, 0.4);
+    }
+
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      opacity: 0;
+      animation: confettiFall 3s ease-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        opacity: 1;
+        transform: translateY(-100px) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(100vh) rotate(720deg);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .intro {
+        font-size: 1.2rem;
+      }
+
+      .verification h2 {
+        font-size: 1.5rem;
+      }
+
+      .letter {
+        font-size: 0.95rem;
+        padding: 20px 20px 100px 50px;
+        max-height: 70vh;
+        width: 95%;
+        position: relative;
+      }
+
+      #typedText {
+        font-size: 14px;
+        padding-bottom: 80px;
+      }
+
+      .letter::before {
+        width: 20px;
+        background-size: 20px 35px;
+      }
+
+      #readMeContainer {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+      }
+
+      .btn-read-me:hover {
+        transform: translateY(-2px);
+      }
+
+      .page1-content, .page2-content {
+        padding: 40px 30px;
+        margin: 20px;
+      }
+
+      .page1-content h2 {
+        font-size: 1.5em;
+      }
+
+      .page2-content {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 30px 25px;
+      }
+
+      .page2-content h1 {
+        font-size: 1.4em;
+      }
+
+      .propose-letter {
+        font-size: 0.9em;
+      }
+
+      .propose-letter p {
+        font-size: 0.95em;
+      }
+
+      .music-control {
+        width: 45px;
+        height: 45px;
+        top: 15px;
+        right: 15px;
+      }
+
+      .music-control svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Persistent Music Control - Always visible -->
+  <button class="music-control" id="musicControl" onclick="toggleMusic()">
+    <svg viewBox="0 0 24 24">
+      <polygon points="5 3 19 12 5 21 5 3"/>
+    </svg>
+  </button>
+
+  <!-- Audio Element - Persistent across all pages -->
+  <audio id="bgMusic" loop>
+    <source src="surething.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Page 1: Intro -->
+  <div class="intro fade-in" id="introText">
+    Hey, this is me shooting my shot, but in the nicest way possible
+  </div>
+  <button class="btn fade-in" id="startBtn" onclick="showVerification()">Read it</button>
+
+  <!-- Page 2: Verification -->
+  <div class="verification" id="verificationBox">
+    <h2>Before Continue</h2>
+    <p>Please verify that you're NV to open the letter (and press the audio button)</p>
+    <input 
+      type="text" 
+      id="nameInput" 
+      placeholder="Nama panjangnya siapa, dut?"
+      autocomplete="off"
+    />
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn" onclick="verifyName()">Continue</button>
+  </div>
+
+  <!-- Page 3: Letter -->
+  <div class="letter" id="letterBox">
+    <p id="typedText"></p>
+    <div id="readMeContainer">
+      <button class="btn-read-me" onclick="showProposePage()">Answer it</button>
+    </div>
+  </div>
+
+  <!-- Page 4: Propose Page -->
+  <div class="propose-page" id="proposePage">
+    <div class="bg-shapes">
+      <div class="shape"></div>
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <div id="proposeQuestion">
+      <div class="page1-content">
+        <h2>Will you be my valentine, naoley?</h2>
+        <div class="heart-icon">
+          <img src="flower.png" alt="" style="width: 100px;">
+        </div>
+        <div class="buttons">
+          <button class="yes-btn" onclick="showFinalPage()">Yes, i do</button>
+          <button class="no-btn" id="noBtn">No, leave me alone</button>
+        </div>
       </div>
     </div>
 
-    <script src="script.js"></script>
-  </body>
+    <div id="finalPage" style="display: none;">
+      <div class="page2-content">
+        <h1>Shoooot, Lot of thanks for making Moreo's 2026 dreamlist comes true</h1>
+        <div style="width: 180px; height: 180px; margin: 0 auto 30px; border-radius: 50%; border: 4px solid #1e1e2f; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f5f5f5; box-shadow: 0 8px 25px rgba(30, 30, 47, 0.2);">
+          <img src="nayo.jpeg" alt="" style="width: 200px;">
+        </div>
+        <div class="propose-letter">
+          <p>Nayo,</p>
+          <p>I promise to make you happy, support you, and stay by your side through everything, including my bad jokes and occasional chaos. Thank you for trusting me with your heart and giving me the chance to be the one who gets to love you. I'll try not to mess it up. I'll love you harder.</p>
+          <p>Fully yours,<br>Moreo</p>
+        </div>
+        <a href="https://t.me/nTupac" class="contact-btn">Talk to meee</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const correctName = "naoley vale";
+    const message = `Hi, pretty.
+
+First of all i wanted to say thank you, for the time, the talks, and the little things you do without realizing how much they matter to me. I really thank God for letting me get to know you. My days feel lighter lately, and i think you have a lot to do with that.
+
+I'm pretty sure you already know that i like you through my actions and i want you to know that its not just a phase, a joke, or something i say without meaning. I mean it. Every bit of it. You make things feel easy and warm at the same time, and i like how i feel when you're around. 
+
+Hold on, did i just say that i like you? No my bad, let me correct that. I love you, Naoley.
+
+If I asked you to make this real properly, would you say yes?`;
+
+    // Music control function
+    function toggleMusic() {
+      const music = document.getElementById('bgMusic');
+      const musicControl = document.getElementById('musicControl');
+      
+      if (music.paused) {
+        music.play();
+        musicControl.innerHTML = '<svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: #1e1e2f;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+      } else {
+        music.pause();
+        musicControl.innerHTML = '<svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: #1e1e2f;"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+      }
+    }
+
+    function showVerification() {
+      const introText = document.getElementById('introText');
+      const startBtn = document.getElementById('startBtn');
+      const verificationBox = document.getElementById('verificationBox');
+      
+      introText.classList.add('fade-out');
+      startBtn.classList.add('fade-out');
+      
+      setTimeout(() => {
+        introText.style.display = 'none';
+        startBtn.style.display = 'none';
+        verificationBox.style.display = 'block';
+        verificationBox.classList.add('fade-in');
+        document.getElementById('nameInput').focus();
+      }, 600);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('nameInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          verifyName();
+        }
+      });
+    });
+
+    function verifyName() {
+      const input = document.getElementById('nameInput').value.trim().toLowerCase();
+      const errorMsg = document.getElementById('errorMsg');
+      
+      if (input === correctName.toLowerCase()) {
+        errorMsg.textContent = '';
+        showLetter();
+      } else {
+        errorMsg.textContent = 'Yah salah, coba ulangg';
+        errorMsg.style.animation = 'none';
+        setTimeout(() => {
+          errorMsg.style.animation = 'shake 0.5s ease';
+        }, 10);
+        document.getElementById('nameInput').value = '';
+        document.getElementById('nameInput').focus();
+      }
+    }
+
+    function showLetter() {
+      const verificationBox = document.getElementById('verificationBox');
+      const letterBox = document.getElementById('letterBox');
+      const typedText = document.getElementById('typedText');
+      const readMeContainer = document.getElementById('readMeContainer');
+      
+      verificationBox.classList.add('fade-out');
+      
+      setTimeout(() => {
+        verificationBox.style.display = 'none';
+        letterBox.style.display = 'block';
+        letterBox.classList.add('fade-in');
+        typedText.innerHTML = "";
+        
+        let i = 0;
+
+        function typeWriter() {
+          if (i < message.length) {
+            typedText.innerHTML += message.charAt(i);
+            i++;
+            setTimeout(typeWriter, 40);
+          } else {
+            setTimeout(() => {
+              readMeContainer.style.display = 'block';
+              setTimeout(() => {
+                readMeContainer.classList.add('show');
+              }, 100);
+            }, 800);
+          }
+        }
+
+        setTimeout(typeWriter, 300);
+      }, 600);
+    }
+
+    function showProposePage() {
+      document.getElementById('proposePage').classList.add('active');
+      
+      // Setup no button movement
+      const noBtn = document.getElementById('noBtn');
+      const page1Content = document.querySelector('.page1-content');
+      
+      noBtn.addEventListener('mouseenter', moveNoButton);
+      noBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        moveNoButton();
+      });
+
+      function moveNoButton() {
+        const contentRect = page1Content.getBoundingClientRect();
+        const btnWidth = noBtn.offsetWidth;
+        const btnHeight = noBtn.offsetHeight;
+        
+        const minX = 20;
+        const minY = 20;
+        const maxX = contentRect.width - btnWidth - 20;
+        const maxY = contentRect.height - btnHeight - 20;
+        
+        const x = Math.random() * (maxX - minX) + minX;
+        const y = Math.random() * (maxY - minY) + minY;
+        
+        noBtn.style.left = x + 'px';
+        noBtn.style.top = y + 'px';
+      }
+    }
+
+    function showFinalPage() {
+      document.getElementById('proposeQuestion').style.display = 'none';
+      document.getElementById('finalPage').style.display = 'flex';
+      createConfetti();
+    }
+
+    function createConfetti() {
+      const colors = ['#1e1e2f', '#2a2a3e', '#3a3a4e', '#4a4a5e', '#5a5a6e'];
+      const confettiContainer = document.getElementById('confettiContainer');
+      
+      for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.5 + 's';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          
+          if (Math.random() > 0.5) {
+            confetti.style.borderRadius = '50%';
+          }
+          
+          confettiContainer.appendChild(confetti);
+          
+          setTimeout(() => {
+            confetti.remove();
+          }, 3500);
+        }, i * 30);
+      }
+    }
+  </script>
+</body>
 </html>
